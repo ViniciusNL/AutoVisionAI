@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoVision AI — Vistoria inteligente de veículos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0D12;
+    --bg-soft: #0D1017;
+    --surface: #12151C;
+    --surface-2: #171B24;
+    --surface-3: #1D222D;
+    --border: #232834;
+    --border-soft: #1A1E27;
+    --text-1: #EEF1F6;
+    --text-2: #9BA3B2;
+    --text-3: #5C6474;
+
+    --teal: #22C58B;
+    --teal-dim: rgba(34,197,139,0.14);
+    --blue: #3B82F6;
+    --blue-dim: rgba(59,130,246,0.14);
+    --violet: #8B5CF6;
+    --violet-dim: rgba(139,92,246,0.14);
+    --cyan: #22D3EE;
+    --cyan-dim: rgba(34,211,238,0.14);
+    --red: #F0475B;
+    --red-dim: rgba(240,71,91,0.14);
+    --amber: #F5A623;
+    --amber-dim: rgba(245,166,35,0.14);
+
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    background: var(--bg);
+    color: var(--text-1);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  body{
+    background-image:
+      radial-gradient(ellipse 900px 500px at 12% -10%, rgba(59,130,246,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 0%, rgba(34,197,139,0.08), transparent 55%);
+    background-attachment: fixed;
+  }
+  ::selection{ background: var(--teal); color: #06110C; }
+  a{ color: inherit; }
+  button{ font-family: inherit; }
+
+  .wrap{
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 28px 32px 80px;
+  }
+
+  /* ---------- header ---------- */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 20px;
+    background: linear-gradient(180deg, var(--surface) 0%, var(--bg-soft) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 24px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+  }
+  .brand{ display:flex; align-items:center; gap:14px; }
+  .brand-mark{
+    width: 44px; height:44px; border-radius: 12px;
+    background: linear-gradient(135deg, #1B6E52 0%, #22C58B 100%);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    box-shadow: 0 6px 18px rgba(34,197,139,0.25);
+  }
+  .brand-text .eyebrow{
+    font-size: 11px; letter-spacing: 0.14em; color: var(--text-3);
+    font-weight: 600; text-transform: uppercase;
+  }
+  .brand-text h1{
+    font-family: var(--font-display);
+    font-size: 19px; font-weight: 600; letter-spacing: -0.01em;
+    margin-top: 2px;
+  }
+  .topbar-right{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+  .stat-strip{ display:flex; align-items:center; gap:10px; color:var(--text-2); font-size: 13px; }
+  .stat-strip .dot{ width:4px; height:4px; border-radius:50%; background: var(--text-3); }
+  .stat-strip b{ color: var(--text-1); font-weight:600; }
+  .period-pill{
+    display:flex; align-items:center; gap:9px;
+    background: var(--surface-2); border:1px solid var(--border);
+    border-radius: 10px; padding: 9px 14px; font-size: 13px; color: var(--text-1);
+  }
+  .icon-btn{
+    width:36px; height:36px; border-radius:10px; border:1px solid var(--border);
+    background: var(--surface-2); display:flex; align-items:center; justify-content:center;
+    color: var(--text-2); cursor:pointer;
+  }
+
+  /* ---------- kpi cards ---------- */
+  .kpi-row{
+    display:grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .kpi-card{
+    position:relative;
+    border-radius: var(--radius-lg);
+    padding: 20px 20px 18px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    overflow:hidden;
+    min-height: 148px;
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .kpi-card.accent-teal{ background: linear-gradient(160deg, #12352A 0%, #0E1D18 65%); border-color: rgba(34,197,139,0.35); }
+  .kpi-card.accent-red{ background: linear-gradient(160deg, #3A121B 0%, #1E1013 65%); border-color: rgba(240,71,91,0.4); }
+  .kpi-top{ display:flex; align-items:flex-start; justify-content:space-between; }
+  .kpi-icon{
+    width:34px; height:34px; border-radius:9px;
+    display:flex; align-items:center; justify-content:center;
+    background: var(--surface-3);
+  }
+  .kpi-card.accent-teal .kpi-icon{ background: rgba(34,197,139,0.18); color: var(--teal); }
+  .kpi-card.accent-red .kpi-icon{ background: rgba(240,71,91,0.2); color: var(--red); }
+  .kpi-badge{
+    font-size: 10.5px; font-weight:700; letter-spacing:0.08em;
+    padding: 4px 9px; border-radius: 100px; text-transform:uppercase;
+  }
+  .kpi-badge.total{ background: rgba(34,197,139,0.18); color:#5EE0AA; }
+  .kpi-badge.alert{ background: rgba(240,71,91,0.22); color:#FF8A97; }
+  .kpi-label{
+    font-size: 11.5px; color: var(--text-2); letter-spacing:0.05em; font-weight:600;
+    text-transform: uppercase; margin-top: 14px;
+  }
+  .kpi-value{
+    font-family: var(--font-display); font-weight:600; font-size: 27px;
+    letter-spacing: -0.01em; margin-top: 4px;
+  }
+  .kpi-sub{ font-size:12px; color: var(--text-3); margin-top:6px; display:flex; align-items:center; gap:5px;}
+  .kpi-card.accent-red .kpi-sub{ color: #E7899490; }
+
+  /* ---------- charts row ---------- */
+  .charts-row{
+    display:grid;
+    grid-template-columns: 1.65fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .panel{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px 20px;
+  }
+  .panel-head{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom: 20px;}
+  .panel-eyebrow{ font-size:11px; letter-spacing:0.12em; color:var(--text-3); font-weight:700; text-transform:uppercase; }
+  .panel-title{ font-family: var(--font-display); font-size:18px; font-weight:600; margin-top:3px;}
+  .legend{ display:flex; gap:16px; align-items:center; }
+  .legend-item{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-2); }
+  .legend-dot{ width:7px; height:7px; border-radius:50%; }
+
+  .bars{
+    display:flex; align-items:flex-end; gap:18px;
+    height: 220px; padding-top: 26px; position:relative;
+  }
+  .bar-col{ flex:1; display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end; gap:10px; position:relative;}
+  .bar-value{ font-size:12px; font-weight:600; color: var(--text-2); font-family: var(--font-mono); }
+  .bar{
+    width: 100%; max-width: 54px; border-radius: 8px 8px 4px 4px;
+    background: linear-gradient(180deg, #3E8CF7 0%, #2563DE 100%);
+    transition: transform .25s ease;
+  }
+  .bar.record{ background: linear-gradient(180deg, #34E0A1 0%, #16A87A 100%); }
+  .bar.current{
+    background: repeating-linear-gradient(135deg, #F5A623, #F5A623 6px, #E0951C 6px, #E0951C 12px);
+    opacity: 0.92;
+  }
+  .bar-col:hover .bar{ transform: scaleY(1.015); }
+  .bar-label{ font-size:12px; color: var(--text-3); font-family: var(--font-mono); }
+
+  .mix-list{ display:flex; flex-direction:column; gap:16px; }
+  .mix-row .mix-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;}
+  .mix-name{ display:flex; align-items:center; gap:9px; font-size:13.5px; color: var(--text-1); font-weight:500;}
+  .mix-dot{ width:9px; height:9px; border-radius:3px; flex-shrink:0; }
+  .mix-value{ font-size:13.5px; font-weight:600; font-family: var(--font-mono); }
+  .mix-sub{ font-size:11px; color: var(--text-3); margin-top:5px; }
+  .mix-track{ height:6px; border-radius:100px; background: var(--surface-3); overflow:hidden; }
+  .mix-fill{ height:100%; border-radius:100px; }
+
+  /* ---------- table panel ---------- */
+  .table-panel{ margin-bottom: 20px; }
+  .filter-chips{ display:flex; gap:8px; }
+  .chip{
+    font-size:12.5px; padding: 7px 13px; border-radius: 100px; cursor:pointer;
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--text-2);
+    font-weight:500; transition: all .15s ease; display:flex; align-items:center; gap:7px;
+  }
+  .chip .n{ font-family: var(--font-mono); font-size:11px; opacity:0.8;}
+  .chip.active{ background: var(--surface-3); color: var(--text-1); border-color:#3A4152; }
+  .chip:hover{ color: var(--text-1); }
+
+  table{ width:100%; border-collapse: collapse; margin-top:6px;}
+  thead th{
+    text-align:left; font-size:11px; letter-spacing:0.07em; text-transform:uppercase;
+    color: var(--text-3); font-weight:600; padding: 10px 14px; border-bottom:1px solid var(--border-soft);
+  }
+  tbody td{ padding: 13px 14px; border-bottom:1px solid var(--border-soft); font-size:13.5px; vertical-align:middle;}
+  tbody tr{ cursor:pointer; transition: background .12s ease; }
+  tbody tr:hover{ background: var(--surface-2); }
+  tbody tr:last-child td{ border-bottom:none; }
+
+  .veh-cell{ display:flex; align-items:center; gap:11px; }
+  .veh-avatar{
+    width:36px; height:36px; border-radius:9px; background:var(--surface-3);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; color: var(--text-2);
+  }
+  .veh-name{ font-weight:600; font-size:13.5px; }
+  .veh-plate{ font-family: var(--font-mono); font-size:11.5px; color:var(--text-3); margin-top:1px; }
+
+  .pill{
+    display:inline-flex; align-items:center; gap:6px; padding: 5px 11px; border-radius:100px;
+    font-size:12px; font-weight:600;
+  }
+  .badge-sev{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:500;}
+  .badge-sev .dot{ width:7px; height:7px; border-radius:50%; }
+  .muted{ color: var(--text-3); }
+  .mono{ font-family: var(--font-mono); }
+  .row-arrow{ color: var(--text-3); text-align:right; }
+
+  /* ---------- footer note ---------- */
+  .footnote{
+    text-align:center; color: var(--text-3); font-size:12px; margin-top:26px; line-height:1.7;
+  }
+  .footnote b{ color: var(--text-2); }
+
+  /* ---------- modal / laudo ---------- */
+  .modal-backdrop{
+    position:fixed; inset:0; background: rgba(4,6,9,0.72); backdrop-filter: blur(3px);
+    display:none; align-items:flex-start; justify-content:center; z-index:100;
+    padding: 40px 20px; overflow-y:auto;
+  }
+  .modal-backdrop.open{ display:flex; }
+  .modal{
+    background: var(--surface); border:1px solid var(--border); border-radius: 20px;
+    max-width: 980px; width:100%; padding: 0; overflow:hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  }
+  .modal-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 22px 26px; border-bottom:1px solid var(--border-soft);
+  }
+  .modal-head-left{ display:flex; align-items:center; gap:14px; }
+  .modal-veh-icon{
+    width:46px; height:46px; border-radius:12px; background: var(--surface-3);
+    display:flex; align-items:center; justify-content:center; color: var(--text-1);
+  }
+  .modal-title{ font-family: var(--font-display); font-size:18px; font-weight:600; }
+  .modal-meta{ font-size:12.5px; color: var(--text-3); margin-top:3px; display:flex; gap:8px; align-items:center; }
+  .modal-close{
+    width:34px; height:34px; border-radius:9px; background:var(--surface-2); border:1px solid var(--border);
+    color: var(--text-2); cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .modal-body{ padding: 24px 26px 28px; }
+
+  .decision-banner{
+    display:flex; align-items:center; gap:14px; padding: 16px 18px; border-radius: 14px;
+    margin-bottom: 22px; border: 1px solid;
+  }
+  .decision-icon{ width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .decision-title{ font-weight:600; font-size:14.5px; }
+  .decision-reason{ font-size:12.5px; color: var(--text-2); margin-top:2px; line-height:1.5; }
+
+  .modal-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 22px;}
+  .car-diagram-wrap{
+    background: var(--bg-soft); border:1px solid var(--border-soft); border-radius:14px;
+    padding: 14px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .diagram-caption{ font-size:11px; color:var(--text-3); margin-top:8px; text-align:center; }
+
+  .metric-stack{ display:flex; flex-direction:column; gap:14px; }
+  .metric-box{ background: var(--bg-soft); border:1px solid var(--border-soft); border-radius:12px; padding:14px 16px;}
+  .metric-box-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;}
+  .metric-label{ font-size:11.5px; color:var(--text-2); font-weight:600; text-transform:uppercase; letter-spacing:0.04em;}
+  .metric-num{ font-family: var(--font-mono); font-weight:600; font-size:14px;}
+  .gauge-track{ height:7px; border-radius:100px; background: var(--surface-3); overflow:hidden;}
+  .gauge-fill{ height:100%; border-radius:100px; }
+
+  .section-label{
+    font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-3);
+    font-weight:700; margin: 22px 0 12px;
+  }
+
+  .damage-list{ display:flex; flex-direction:column; gap:8px; }
+  .damage-item{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    background: var(--bg-soft); border:1px solid var(--border-soft); border-radius:10px; padding:10px 14px;
+  }
+  .damage-item-left{ display:flex; align-items:center; gap:10px; font-size:13px;}
+  .damage-cat-dot{ width:9px; height:9px; border-radius:3px; flex-shrink:0;}
+  .damage-conf{ font-size:11.5px; color:var(--text-3); font-family: var(--font-mono);}
+
+  .signal-list{ display:flex; flex-direction:column; gap:8px; }
+  .signal-item{
+    display:flex; align-items:flex-start; gap:11px;
+    background: rgba(240,71,91,0.07); border:1px solid rgba(240,71,91,0.25); border-radius:10px; padding:11px 14px;
+  }
+  .signal-icon{ color: var(--red); flex-shrink:0; margin-top:1px; }
+  .signal-name{ font-size:13px; font-weight:600; color:#FF98A3; }
+  .signal-detail{ font-size:12px; color: var(--text-2); margin-top:2px; line-height:1.5;}
+  .signal-weight{ font-size:11px; font-family: var(--font-mono); color: var(--text-3); margin-left:auto; flex-shrink:0; padding-top:1px;}
+
+  .empty-note{ font-size:12.5px; color: var(--text-3); padding: 8px 2px; }
+
+  .pipeline{ display:flex; flex-direction:column; gap:0; }
+  .pipe-step{ display:flex; gap:14px; position:relative; padding-bottom: 18px; }
+  .pipe-step:last-child{ padding-bottom:0; }
+  .pipe-marker{
+    width:26px; height:26px; border-radius:50%; background: var(--surface-3); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; z-index:1;
+    color: var(--text-2);
+  }
+  .pipe-step.done .pipe-marker{ background: rgba(34,197,139,0.18); border-color: rgba(34,197,139,0.4); color: var(--teal); }
+  .pipe-step.flag .pipe-marker{ background: rgba(240,71,91,0.18); border-color: rgba(240,71,91,0.4); color: var(--red); }
+  .pipe-line{
+    position:absolute; left:12px; top:26px; bottom:-2px; width:1px; background: var(--border);
+  }
+  .pipe-step:last-child .pipe-line{ display:none; }
+  .pipe-text{ padding-top:3px; }
+  .pipe-title{ font-size:13px; font-weight:600; }
+  .pipe-detail{ font-size:12px; color: var(--text-3); margin-top:2px; }
+
+  .cost-table{ width:100%; border-collapse:collapse; }
+  .cost-table td{ padding:8px 4px; font-size:12.5px; border-bottom:1px solid var(--border-soft); }
+  .cost-table tr:last-child td{ border-bottom:none; }
+
+  @media (max-width: 1100px){
+    .kpi-row{ grid-template-columns: repeat(3,1fr); }
+    .charts-row{ grid-template-columns: 1fr; }
+  }
+  @media (max-width: 720px){
+    .wrap{ padding: 18px 14px 60px; }
+    .kpi-row{ grid-template-columns: repeat(2,1fr); }
+    .topbar{ flex-direction:column; align-items:flex-start; }
+    .modal-grid{ grid-template-columns: 1fr; }
+    table thead{ display:none; }
+    tbody td{ display:block; padding:4px 14px; }
+    tbody tr{ display:block; padding: 10px 0; border-bottom:1px solid var(--border-soft); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition: none !important; animation: none !important; }
+  }
+
+  [tabindex]:focus-visible, button:focus-visible, tr:focus-visible{
+    outline: 2px solid var(--teal); outline-offset: 2px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <!-- content injected by JS -->
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" id="modal" role="dialog" aria-modal="true"></div>
+</div>
+
+<script id="dashboard-data" type="application/json">{"generated_at": "2026-08-27", "kpis": {"total_inspections": 140, "total_estimated_cost": 523918.18, "avg_ticket": 3742.27, "auto_approval_rate": 80.7, "n_auto": 113, "n_manual": 17, "fraud_rate": 7.1, "n_fraud": 10}, "yearly_trend": [{"year": "2021", "count": 9, "cost": 47877.85, "status": "closed"}, {"year": "2022", "count": 9, "cost": 28542.32, "status": "closed"}, {"year": "2023", "count": 24, "cost": 98414.34, "status": "closed"}, {"year": "2024", "count": 27, "cost": 87341.48, "status": "closed"}, {"year": "2025", "count": 40, "cost": 165445.69, "status": "record"}, {"year": "2026", "count": 31, "cost": 96296.5, "status": "current"}], "damage_mix": [{"key": "estrutural", "label": "Estrutural / Chassi", "color": "#F0475B", "cost": 275069.76, "count": 79, "pct": 52.5}, {"key": "vidro", "label": "Vidro / Para-brisa", "color": "#F5A623", "cost": 87278.4, "count": 89, "pct": 16.7}, {"key": "amassado", "label": "Amassados", "color": "#3B82F6", "cost": 67367.6, "count": 93, "pct": 12.9}, {"key": "farol_lanterna", "label": "Farol / Lanterna", "color": "#8B5CF6", "cost": 34649.86, "count": 87, "pct": 6.6}, {"key": "pneu_roda", "label": "Pneu / Roda", "color": "#2DD4BF", "cost": 34379.52, "count": 75, "pct": 6.6}, {"key": "arranhao", "label": "Arranhões", "color": "#22C58B", "cost": 25172.99, "count": 87, "pct": 4.8}], "recent_inspections": [{"vehicle_id": "VST-2022-1044", "plate_masked": "XZO•R••", "make": "Jeep", "model": "Compass", "date": "2026-08-27", "insurer": "SulAmérica", "state": "BA", "n_images": 3, "severity_score": 0.0, "severity_band": "leve", "fraud_score": 0.0, "estimated_cost": 0.0, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": null, "damage_regions": [], "tamper_signals": [], "quality": [{"sharpness": 57.5, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 58.0, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 58.5, "brightness": 175.0, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2025-1138", "plate_masked": "XUS•Q••", "make": "Renault", "model": "Kwid", "date": "2026-08-18", "insurer": "SulAmérica", "state": "RJ", "n_images": 3, "severity_score": 4.0, "severity_band": "leve", "fraud_score": 0.0, "estimated_cost": 284.93, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "farol_lanterna", "damage_regions": [{"category": "farol_lanterna", "bbox": [0.75, 0.75, 0.25, 0.25], "confidence": 0.59, "severity": 12.1}], "tamper_signals": [], "quality": [{"sharpness": 58.4, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 58.6, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 58.7, "brightness": 175.0, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2024-1115", "plate_masked": "KDY•B••", "make": "Honda", "model": "Civic", "date": "2026-08-15", "insurer": "Allianz Seguros", "state": "GO", "n_images": 2, "severity_score": 42.8, "severity_band": "moderado", "fraud_score": 0.0, "estimated_cost": 1840.1, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "vidro", "damage_regions": [{"category": "vidro", "bbox": [0.5, 0.0, 0.25, 0.25], "confidence": 0.67, "severity": 37.5}, {"category": "arranhao", "bbox": [0.75, 0.25, 0.25, 0.25], "confidence": 0.65, "severity": 33.9}, {"category": "farol_lanterna", "bbox": [0.25, 0.5, 0.25, 0.25], "confidence": 0.65, "severity": 32.1}], "tamper_signals": [], "quality": [{"sharpness": 67.0, "brightness": 174.9, "resolution": [640, 480], "usable": true}, {"sharpness": 60.3, "brightness": 174.6, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2025-1124", "plate_masked": "XUN•L••", "make": "Honda", "model": "Civic", "date": "2026-08-15", "insurer": "Bradesco Seguros", "state": "RS", "n_images": 3, "severity_score": 8.3, "severity_band": "leve", "fraud_score": 0.0, "estimated_cost": 574.46, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "farol_lanterna", "damage_regions": [{"category": "farol_lanterna", "bbox": [0.75, 0.75, 0.25, 0.25], "confidence": 0.58, "severity": 10.9}, {"category": "farol_lanterna", "bbox": [0.75, 0.0, 0.25, 0.25], "confidence": 0.59, "severity": 13.9}], "tamper_signals": [], "quality": [{"sharpness": 60.5, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 59.1, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 60.0, "brightness": 174.9, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2022-1059", "plate_masked": "NQK•M••", "make": "Nissan", "model": "Kicks", "date": "2026-08-11", "insurer": "SulAmérica", "state": "SP", "n_images": 4, "severity_score": 10.6, "severity_band": "leve", "fraud_score": 0.0, "estimated_cost": 875.78, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "pneu_roda", "damage_regions": [{"category": "pneu_roda", "bbox": [0.25, 0.25, 0.25, 0.25], "confidence": 0.58, "severity": 10.5}, {"category": "pneu_roda", "bbox": [0.25, 0.25, 0.25, 0.25], "confidence": 0.6, "severity": 15.7}, {"category": "arranhao", "bbox": [0.25, 0.0, 0.25, 0.25], "confidence": 0.59, "severity": 12.7}], "tamper_signals": [], "quality": [{"sharpness": 58.4, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 59.3, "brightness": 174.9, "resolution": [640, 480], "usable": true}, {"sharpness": 58.7, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 56.8, "brightness": 174.8, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2025-1133", "plate_masked": "BQL•V••", "make": "Hyundai", "model": "HB20", "date": "2026-08-11", "insurer": "Allianz Seguros", "state": "SP", "n_images": 4, "severity_score": 64.0, "severity_band": "grave", "fraud_score": 44.2, "estimated_cost": 4964.96, "decision": "revisao_manual", "decision_reason": "Severidade alta ou sinais leves de fraude exigem validação humana.", "primary_category": "farol_lanterna", "damage_regions": [{"category": "farol_lanterna", "bbox": [0.25, 0.5, 0.25, 0.25], "confidence": 0.75, "severity": 66.4}, {"category": "pneu_roda", "bbox": [0.25, 0.25, 0.25, 0.25], "confidence": 0.72, "severity": 55.1}, {"category": "amassado", "bbox": [0.5, 0.25, 0.25, 0.25], "confidence": 0.71, "severity": 50.8}, {"category": "arranhao", "bbox": [0.25, 0.75, 0.25, 0.25], "confidence": 0.66, "severity": 36.3}, {"category": "farol_lanterna", "bbox": [0.75, 0.0, 0.25, 0.25], "confidence": 0.66, "severity": 34.7}, {"category": "vidro", "bbox": [0.0, 0.5, 0.25, 0.25], "confidence": 0.64, "severity": 27.8}, {"category": "arranhao", "bbox": [0.75, 0.25, 0.25, 0.25], "confidence": 0.67, "severity": 40.0}, {"category": "farol_lanterna", "bbox": [0.75, 0.0, 0.25, 0.25], "confidence": 0.67, "severity": 37.5}], "tamper_signals": [{"name": "ela_anomalia", "triggered": true, "detail": "Análise de nível de erro (ELA) aponta região com edição localizada (razão 21.67)", "weight": 23.837000000000003}, {"name": "ela_anomalia", "triggered": true, "detail": "Análise de nível de erro (ELA) aponta região com edição localizada (razão 18.49)", "weight": 20.339}], "quality": [{"sharpness": 108.3, "brightness": 174.2, "resolution": [640, 480], "usable": true}, {"sharpness": 77.3, "brightness": 174.0, "resolution": [640, 480], "usable": true}, {"sharpness": 64.2, "brightness": 174.5, "resolution": [640, 480], "usable": true}, {"sharpness": 73.6, "brightness": 174.4, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2023-1073", "plate_masked": "TGO•E••", "make": "Hyundai", "model": "Creta", "date": "2026-06-27", "insurer": "Tokio Marine", "state": "PE", "n_images": 3, "severity_score": 3.8, "severity_band": "leve", "fraud_score": 0.0, "estimated_cost": 278.78, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "farol_lanterna", "damage_regions": [{"category": "farol_lanterna", "bbox": [0.25, 0.5, 0.25, 0.25], "confidence": 0.58, "severity": 11.3}], "tamper_signals": [], "quality": [{"sharpness": 61.2, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 57.6, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 57.4, "brightness": 175.0, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2024-1109", "plate_masked": "DPG•G••", "make": "Jeep", "model": "Compass", "date": "2026-06-23", "insurer": "Azul Seguros", "state": "RS", "n_images": 2, "severity_score": 11.5, "severity_band": "leve", "fraud_score": 0.0, "estimated_cost": 626.18, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "farol_lanterna", "damage_regions": [{"category": "farol_lanterna", "bbox": [0.25, 0.5, 0.25, 0.25], "confidence": 0.6, "severity": 15.0}, {"category": "pneu_roda", "bbox": [0.25, 0.25, 0.25, 0.25], "confidence": 0.58, "severity": 10.6}], "tamper_signals": [], "quality": [{"sharpness": 57.7, "brightness": 174.8, "resolution": [640, 480], "usable": true}, {"sharpness": 57.9, "brightness": 175.0, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2024-1093", "plate_masked": "ZKB•E••", "make": "Ford", "model": "Ka", "date": "2026-06-03", "insurer": "Bradesco Seguros", "state": "PE", "n_images": 3, "severity_score": 7.6, "severity_band": "leve", "fraud_score": 0.0, "estimated_cost": 2948.48, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "vidro", "damage_regions": [{"category": "vidro", "bbox": [0.5, 0.75, 0.25, 0.25], "confidence": 0.58, "severity": 10.8}, {"category": "estrutural", "bbox": [0.5, 0.5, 0.25, 0.25], "confidence": 0.58, "severity": 9.5}], "tamper_signals": [], "quality": [{"sharpness": 59.8, "brightness": 174.9, "resolution": [640, 480], "usable": true}, {"sharpness": 59.2, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 58.9, "brightness": 175.0, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2023-1070", "plate_masked": "MYX•Z••", "make": "Chevrolet", "model": "Tracker", "date": "2026-06-02", "insurer": "Porto Seguro", "state": "PE", "n_images": 3, "severity_score": 34.8, "severity_band": "moderado", "fraud_score": 0.0, "estimated_cost": 5054.34, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "estrutural", "damage_regions": [{"category": "estrutural", "bbox": [0.0, 0.25, 0.25, 0.25], "confidence": 0.65, "severity": 32.4}, {"category": "arranhao", "bbox": [0.25, 0.0, 0.25, 0.25], "confidence": 0.61, "severity": 18.1}, {"category": "farol_lanterna", "bbox": [0.25, 0.5, 0.25, 0.25], "confidence": 0.6, "severity": 17.8}, {"category": "vidro", "bbox": [0.0, 0.5, 0.25, 0.25], "confidence": 0.59, "severity": 11.8}], "tamper_signals": [], "quality": [{"sharpness": 59.8, "brightness": 174.6, "resolution": [640, 480], "usable": true}, {"sharpness": 64.4, "brightness": 174.9, "resolution": [640, 480], "usable": true}, {"sharpness": 66.3, "brightness": 174.9, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2025-1122", "plate_masked": "VAP•R••", "make": "Nissan", "model": "Kicks", "date": "2026-05-21", "insurer": "SulAmérica", "state": "RS", "n_images": 3, "severity_score": 42.9, "severity_band": "moderado", "fraud_score": 0.0, "estimated_cost": 12710.02, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "estrutural", "damage_regions": [{"category": "estrutural", "bbox": [0.5, 0.5, 0.25, 0.25], "confidence": 0.69, "severity": 44.0}, {"category": "farol_lanterna", "bbox": [0.75, 0.0, 0.25, 0.25], "confidence": 0.63, "severity": 26.3}, {"category": "estrutural", "bbox": [0.5, 0.5, 0.25, 0.25], "confidence": 0.64, "severity": 30.1}, {"category": "estrutural", "bbox": [0.0, 0.25, 0.25, 0.25], "confidence": 0.64, "severity": 30.7}, {"category": "arranhao", "bbox": [0.75, 0.25, 0.25, 0.25], "confidence": 0.61, "severity": 20.6}], "tamper_signals": [], "quality": [{"sharpness": 66.9, "brightness": 174.6, "resolution": [640, 480], "usable": true}, {"sharpness": 59.3, "brightness": 174.7, "resolution": [640, 480], "usable": true}, {"sharpness": 59.6, "brightness": 174.3, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2025-1126", "plate_masked": "OBB•D••", "make": "Toyota", "model": "Hilux", "date": "2026-05-19", "insurer": "Tokio Marine", "state": "GO", "n_images": 4, "severity_score": 46.6, "severity_band": "moderado", "fraud_score": 0.0, "estimated_cost": 3296.99, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "amassado", "damage_regions": [{"category": "farol_lanterna", "bbox": [0.75, 0.75, 0.25, 0.25], "confidence": 0.6, "severity": 17.4}, {"category": "amassado", "bbox": [0.0, 0.75, 0.25, 0.25], "confidence": 0.72, "severity": 53.6}, {"category": "farol_lanterna", "bbox": [0.75, 0.75, 0.25, 0.25], "confidence": 0.66, "severity": 37.0}, {"category": "pneu_roda", "bbox": [0.75, 0.5, 0.25, 0.25], "confidence": 0.66, "severity": 35.0}, {"category": "arranhao", "bbox": [0.75, 0.25, 0.25, 0.25], "confidence": 0.59, "severity": 14.5}, {"category": "vidro", "bbox": [0.0, 0.5, 0.25, 0.25], "confidence": 0.59, "severity": 14.0}], "tamper_signals": [], "quality": [{"sharpness": 63.5, "brightness": 174.9, "resolution": [640, 480], "usable": true}, {"sharpness": 66.1, "brightness": 174.9, "resolution": [640, 480], "usable": true}, {"sharpness": 65.5, "brightness": 174.9, "resolution": [640, 480], "usable": true}, {"sharpness": 63.5, "brightness": 174.9, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2021-1003", "plate_masked": "VNT•M••", "make": "Jeep", "model": "Compass", "date": "2026-05-18", "insurer": "Mapfre", "state": "SP", "n_images": 3, "severity_score": 0.0, "severity_band": "leve", "fraud_score": 0.0, "estimated_cost": 0.0, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": null, "damage_regions": [], "tamper_signals": [], "quality": [{"sharpness": 59.0, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 58.6, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 57.1, "brightness": 175.0, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2024-1114", "plate_masked": "ODD•A••", "make": "Honda", "model": "Civic", "date": "2026-05-18", "insurer": "Tokio Marine", "state": "BA", "n_images": 4, "severity_score": 40.0, "severity_band": "moderado", "fraud_score": 0.0, "estimated_cost": 5033.15, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "farol_lanterna", "damage_regions": [{"category": "pneu_roda", "bbox": [0.75, 0.5, 0.25, 0.25], "confidence": 0.59, "severity": 11.8}, {"category": "amassado", "bbox": [0.0, 0.0, 0.25, 0.25], "confidence": 0.62, "severity": 22.0}, {"category": "amassado", "bbox": [0.5, 0.25, 0.25, 0.25], "confidence": 0.63, "severity": 26.4}, {"category": "estrutural", "bbox": [0.5, 0.5, 0.25, 0.25], "confidence": 0.6, "severity": 16.3}, {"category": "farol_lanterna", "bbox": [0.75, 0.75, 0.25, 0.25], "confidence": 0.71, "severity": 51.8}], "tamper_signals": [], "quality": [{"sharpness": 61.1, "brightness": 174.9, "resolution": [640, 480], "usable": true}, {"sharpness": 61.3, "brightness": 174.7, "resolution": [640, 480], "usable": true}, {"sharpness": 58.4, "brightness": 174.7, "resolution": [640, 480], "usable": true}, {"sharpness": 66.1, "brightness": 174.9, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2023-1060", "plate_masked": "EOX•L••", "make": "Toyota", "model": "Hilux", "date": "2026-04-25", "insurer": "SulAmérica", "state": "GO", "n_images": 3, "severity_score": 16.7, "severity_band": "leve", "fraud_score": 0.0, "estimated_cost": 1543.87, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "farol_lanterna", "damage_regions": [{"category": "farol_lanterna", "bbox": [0.25, 0.5, 0.25, 0.25], "confidence": 0.59, "severity": 13.2}, {"category": "vidro", "bbox": [0.0, 0.5, 0.25, 0.25], "confidence": 0.59, "severity": 12.0}, {"category": "farol_lanterna", "bbox": [0.25, 0.5, 0.25, 0.25], "confidence": 0.59, "severity": 12.9}, {"category": "pneu_roda", "bbox": [0.25, 0.25, 0.25, 0.25], "confidence": 0.58, "severity": 9.4}], "tamper_signals": [], "quality": [{"sharpness": 61.2, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 60.9, "brightness": 174.9, "resolution": [640, 480], "usable": true}, {"sharpness": 62.6, "brightness": 174.9, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2023-1086", "plate_masked": "JXT•O••", "make": "Jeep", "model": "Compass", "date": "2026-04-24", "insurer": "Tokio Marine", "state": "PR", "n_images": 3, "severity_score": 64.3, "severity_band": "grave", "fraud_score": 26.3, "estimated_cost": 13783.62, "decision": "revisao_manual", "decision_reason": "Severidade alta ou sinais leves de fraude exigem validação humana.", "primary_category": "estrutural", "damage_regions": [{"category": "pneu_roda", "bbox": [0.75, 0.5, 0.25, 0.25], "confidence": 0.66, "severity": 35.5}, {"category": "vidro", "bbox": [0.0, 0.5, 0.25, 0.25], "confidence": 0.65, "severity": 33.8}, {"category": "estrutural", "bbox": [0.0, 0.25, 0.25, 0.25], "confidence": 0.75, "severity": 64.8}, {"category": "amassado", "bbox": [0.5, 0.25, 0.25, 0.25], "confidence": 0.71, "severity": 51.0}, {"category": "farol_lanterna", "bbox": [0.75, 0.0, 0.25, 0.25], "confidence": 0.69, "severity": 44.7}, {"category": "estrutural", "bbox": [0.0, 0.25, 0.25, 0.25], "confidence": 0.68, "severity": 43.5}], "tamper_signals": [{"name": "ela_anomalia", "triggered": true, "detail": "Análise de nível de erro (ELA) aponta região com edição localizada (razão 23.93)", "weight": 26.323}], "quality": [{"sharpness": 70.8, "brightness": 174.1, "resolution": [640, 480], "usable": true}, {"sharpness": 93.6, "brightness": 174.2, "resolution": [640, 480], "usable": true}, {"sharpness": 99.7, "brightness": 173.8, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2021-1007", "plate_masked": "ZRD•U••", "make": "Toyota", "model": "Hilux", "date": "2026-04-06", "insurer": "Azul Seguros", "state": "SC", "n_images": 2, "severity_score": 43.5, "severity_band": "moderado", "fraud_score": 0.0, "estimated_cost": 4537.9, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "arranhao", "damage_regions": [{"category": "estrutural", "bbox": [0.0, 0.25, 0.25, 0.25], "confidence": 0.62, "severity": 22.8}, {"category": "pneu_roda", "bbox": [0.25, 0.25, 0.25, 0.25], "confidence": 0.6, "severity": 16.7}, {"category": "arranhao", "bbox": [0.75, 0.25, 0.25, 0.25], "confidence": 0.67, "severity": 40.1}, {"category": "amassado", "bbox": [0.5, 0.25, 0.25, 0.25], "confidence": 0.61, "severity": 20.5}], "tamper_signals": [], "quality": [{"sharpness": 57.9, "brightness": 174.7, "resolution": [640, 480], "usable": true}, {"sharpness": 66.4, "brightness": 174.9, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2025-1125", "plate_masked": "AQU•S••", "make": "Ford", "model": "Ka", "date": "2026-04-02", "insurer": "Tokio Marine", "state": "RS", "n_images": 2, "severity_score": 30.5, "severity_band": "moderado", "fraud_score": 0.0, "estimated_cost": 1690.29, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "amassado", "damage_regions": [{"category": "vidro", "bbox": [0.5, 0.0, 0.25, 0.25], "confidence": 0.61, "severity": 20.3}, {"category": "arranhao", "bbox": [0.25, 0.0, 0.25, 0.25], "confidence": 0.6, "severity": 17.4}, {"category": "amassado", "bbox": [0.0, 0.75, 0.25, 0.25], "confidence": 0.63, "severity": 24.7}], "tamper_signals": [], "quality": [{"sharpness": 58.8, "brightness": 174.7, "resolution": [640, 480], "usable": true}, {"sharpness": 57.8, "brightness": 174.7, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2023-1079", "plate_masked": "IQV•E••", "make": "Hyundai", "model": "Creta", "date": "2026-03-23", "insurer": "Mapfre", "state": "MG", "n_images": 2, "severity_score": 57.4, "severity_band": "grave", "fraud_score": 0.0, "estimated_cost": 6148.9, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "arranhao", "damage_regions": [{"category": "vidro", "bbox": [0.5, 0.75, 0.25, 0.25], "confidence": 0.66, "severity": 34.7}, {"category": "pneu_roda", "bbox": [0.25, 0.25, 0.25, 0.25], "confidence": 0.65, "severity": 33.4}, {"category": "arranhao", "bbox": [0.75, 0.25, 0.25, 0.25], "confidence": 0.72, "severity": 56.1}, {"category": "estrutural", "bbox": [0.5, 0.5, 0.25, 0.25], "confidence": 0.66, "severity": 36.9}], "tamper_signals": [], "quality": [{"sharpness": 64.2, "brightness": 173.8, "resolution": [640, 480], "usable": true}, {"sharpness": 75.3, "brightness": 174.5, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2023-1084", "plate_masked": "TEI•J••", "make": "Hyundai", "model": "HB20", "date": "2026-03-18", "insurer": "Bradesco Seguros", "state": "PE", "n_images": 3, "severity_score": 9.2, "severity_band": "leve", "fraud_score": 0.0, "estimated_cost": 3215.12, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "estrutural", "damage_regions": [{"category": "estrutural", "bbox": [0.5, 0.5, 0.25, 0.25], "confidence": 0.6, "severity": 15.7}, {"category": "amassado", "bbox": [0.5, 0.25, 0.25, 0.25], "confidence": 0.58, "severity": 10.3}], "tamper_signals": [], "quality": [{"sharpness": 57.2, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 57.2, "brightness": 174.8, "resolution": [640, 480], "usable": true}, {"sharpness": 57.7, "brightness": 175.0, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2023-1081", "plate_masked": "CXZ•D••", "make": "Toyota", "model": "Corolla", "date": "2026-03-13", "insurer": "Mapfre", "state": "MG", "n_images": 4, "severity_score": 69.8, "severity_band": "grave", "fraud_score": 41.9, "estimated_cost": 6333.09, "decision": "revisao_manual", "decision_reason": "Severidade alta ou sinais leves de fraude exigem validação humana.", "primary_category": "arranhao", "damage_regions": [{"category": "farol_lanterna", "bbox": [0.25, 0.5, 0.25, 0.25], "confidence": 0.69, "severity": 44.0}, {"category": "arranhao", "bbox": [0.75, 0.25, 0.25, 0.25], "confidence": 0.68, "severity": 42.3}, {"category": "vidro", "bbox": [0.0, 0.5, 0.25, 0.25], "confidence": 0.74, "severity": 63.0}, {"category": "farol_lanterna", "bbox": [0.75, 0.0, 0.25, 0.25], "confidence": 0.74, "severity": 62.4}, {"category": "arranhao", "bbox": [0.75, 0.25, 0.25, 0.25], "confidence": 0.76, "severity": 67.1}, {"category": "amassado", "bbox": [0.5, 0.25, 0.25, 0.25], "confidence": 0.69, "severity": 46.4}, {"category": "vidro", "bbox": [0.5, 0.75, 0.25, 0.25], "confidence": 0.73, "severity": 57.0}, {"category": "arranhao", "bbox": [0.25, 0.75, 0.25, 0.25], "confidence": 0.69, "severity": 43.9}], "tamper_signals": [{"name": "ela_anomalia", "triggered": true, "detail": "Análise de nível de erro (ELA) aponta região com edição localizada (razão 19.99)", "weight": 21.989}, {"name": "ela_anomalia", "triggered": true, "detail": "Análise de nível de erro (ELA) aponta região com edição localizada (razão 18.06)", "weight": 19.866}], "quality": [{"sharpness": 72.0, "brightness": 174.4, "resolution": [640, 480], "usable": true}, {"sharpness": 93.7, "brightness": 174.2, "resolution": [640, 480], "usable": true}, {"sharpness": 86.8, "brightness": 174.7, "resolution": [640, 480], "usable": true}, {"sharpness": 86.9, "brightness": 173.9, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2021-1023", "plate_masked": "EJO•D••", "make": "Hyundai", "model": "HB20", "date": "2026-03-10", "insurer": "Tokio Marine", "state": "SP", "n_images": 4, "severity_score": 6.5, "severity_band": "leve", "fraud_score": 0.0, "estimated_cost": 490.11, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "pneu_roda", "damage_regions": [{"category": "pneu_roda", "bbox": [0.75, 0.5, 0.25, 0.25], "confidence": 0.58, "severity": 10.1}, {"category": "arranhao", "bbox": [0.75, 0.25, 0.25, 0.25], "confidence": 0.58, "severity": 9.3}], "tamper_signals": [], "quality": [{"sharpness": 56.8, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 57.9, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 59.7, "brightness": 174.9, "resolution": [640, 480], "usable": true}, {"sharpness": 57.1, "brightness": 175.0, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2023-1068", "plate_masked": "XIR•A••", "make": "Hyundai", "model": "HB20", "date": "2026-03-04", "insurer": "Porto Seguro", "state": "CE", "n_images": 4, "severity_score": 53.0, "severity_band": "grave", "fraud_score": 74.0, "estimated_cost": 6983.36, "decision": "fraude_suspeita", "decision_reason": "Sinais combinados de manipulação de imagem excedem o limite de tolerância.", "primary_category": "amassado", "damage_regions": [{"category": "amassado", "bbox": [0.5, 0.25, 0.25, 0.25], "confidence": 0.71, "severity": 53.1}, {"category": "arranhao", "bbox": [0.25, 0.0, 0.25, 0.25], "confidence": 0.7, "severity": 47.7}, {"category": "vidro", "bbox": [0.5, 0.0, 0.25, 0.25], "confidence": 0.61, "severity": 19.1}, {"category": "amassado", "bbox": [0.5, 0.25, 0.25, 0.25], "confidence": 0.59, "severity": 13.9}, {"category": "estrutural", "bbox": [0.0, 0.25, 0.25, 0.25], "confidence": 0.62, "severity": 24.3}, {"category": "farol_lanterna", "bbox": [0.75, 0.75, 0.25, 0.25], "confidence": 0.66, "severity": 35.3}, {"category": "pneu_roda", "bbox": [0.75, 0.5, 0.25, 0.25], "confidence": 0.63, "severity": 27.2}], "tamper_signals": [{"name": "software_edicao", "triggered": true, "detail": "Metadado 'Software' indica edição: Adobe Photoshop 24.0", "weight": 30.0}, {"name": "data_captura_ausente", "triggered": true, "detail": "Sem data/hora original de captura", "weight": 8.0}, {"name": "exif_ausente", "triggered": true, "detail": "Imagem sem metadados EXIF (comum em capturas de tela ou imagens editadas)", "weight": 12.0}, {"name": "exif_ausente", "triggered": true, "detail": "Imagem sem metadados EXIF (comum em capturas de tela ou imagens editadas)", "weight": 12.0}, {"name": "exif_ausente", "triggered": true, "detail": "Imagem sem metadados EXIF (comum em capturas de tela ou imagens editadas)", "weight": 12.0}], "quality": [{"sharpness": 160.2, "brightness": 171.1, "resolution": [640, 480], "usable": true}, {"sharpness": 58.2, "brightness": 174.7, "resolution": [640, 480], "usable": true}, {"sharpness": 58.6, "brightness": 174.7, "resolution": [640, 480], "usable": true}, {"sharpness": 65.6, "brightness": 174.9, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2024-1096", "plate_masked": "TPW•N••", "make": "Hyundai", "model": "Creta", "date": "2026-03-02", "insurer": "Porto Seguro", "state": "BA", "n_images": 2, "severity_score": 6.8, "severity_band": "leve", "fraud_score": 0.0, "estimated_cost": 295.68, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "farol_lanterna", "damage_regions": [{"category": "farol_lanterna", "bbox": [0.75, 0.0, 0.25, 0.25], "confidence": 0.59, "severity": 13.5}], "tamper_signals": [], "quality": [{"sharpness": 57.5, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 56.6, "brightness": 174.9, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2023-1062", "plate_masked": "CBN•W••", "make": "Hyundai", "model": "Creta", "date": "2026-02-16", "insurer": "Porto Seguro", "state": "RS", "n_images": 4, "severity_score": 4.0, "severity_band": "leve", "fraud_score": 0.0, "estimated_cost": 315.65, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "farol_lanterna", "damage_regions": [{"category": "farol_lanterna", "bbox": [0.75, 0.75, 0.25, 0.25], "confidence": 0.6, "severity": 16.1}], "tamper_signals": [], "quality": [{"sharpness": 57.4, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 57.8, "brightness": 174.8, "resolution": [640, 480], "usable": true}, {"sharpness": 57.4, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 58.4, "brightness": 175.0, "resolution": [640, 480], "usable": true}]}, {"vehicle_id": "VST-2021-1026", "plate_masked": "CHU•H••", "make": "Hyundai", "model": "Creta", "date": "2026-02-15", "insurer": "SulAmérica", "state": "RS", "n_images": 3, "severity_score": 15.4, "severity_band": "leve", "fraud_score": 0.0, "estimated_cost": 3286.98, "decision": "aprovado_automatico", "decision_reason": "Danos consistentes com o relato, sem sinais de fraude, dentro do limite de alçada automática.", "primary_category": "estrutural", "damage_regions": [{"category": "estrutural", "bbox": [0.0, 0.25, 0.25, 0.25], "confidence": 0.61, "severity": 18.5}, {"category": "pneu_roda", "bbox": [0.75, 0.5, 0.25, 0.25], "confidence": 0.6, "severity": 15.6}], "tamper_signals": [], "quality": [{"sharpness": 58.1, "brightness": 175.0, "resolution": [640, 480], "usable": true}, {"sharpness": 57.5, "brightness": 174.8, "resolution": [640, 480], "usable": true}, {"sharpness": 56.8, "brightness": 174.8, "resolution": [640, 480], "usable": true}]}], "highlight_ids": ["VST-2023-1060", "VST-2025-1133", "VST-2023-1068"], "decision_meta": {"aprovado_automatico": {"label": "Aprovado automaticamente", "color": "#22C58B", "icon": "check"}, "revisao_manual": {"label": "Revisão manual", "color": "#F5A623", "icon": "flag"}, "fraude_suspeita": {"label": "Fraude suspeita", "color": "#F0475B", "icon": "alert"}}, "severity_meta": {"leve": {"label": "Leve", "color": "#22C58B"}, "moderado": {"label": "Moderado", "color": "#F5A623"}, "grave": {"label": "Grave", "color": "#F0475B"}, "critico": {"label": "Crítico", "color": "#B91C3C"}}, "category_meta": {"amassado": {"label": "Amassados", "color": "#3B82F6"}, "arranhao": {"label": "Arranhões", "color": "#22C58B"}, "vidro": {"label": "Vidro / Para-brisa", "color": "#F5A623"}, "farol_lanterna": {"label": "Farol / Lanterna", "color": "#8B5CF6"}, "estrutural": {"label": "Estrutural / Chassi", "color": "#F0475B"}, "pneu_roda": {"label": "Pneu / Roda", "color": "#2DD4BF"}}}</script>
+<script>
+(function(){
+  "use strict";
+
+  var DATA = JSON.parse(document.getElementById('dashboard-data').textContent);
+
+  // ---------------------------------------------------------------------
+  // helpers
+  // ---------------------------------------------------------------------
+  function brl(n){
+    return 'R$\u00A0' + Math.round(n).toLocaleString('pt-BR');
+  }
+  function brlFull(n){
+    return 'R$\u00A0' + n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+  function pct(n){ return n.toLocaleString('pt-BR', {maximumFractionDigits:1}) + '%'; }
+  function dateBR(iso){
+    var d = new Date(iso + 'T12:00:00');
+    return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'short', year:'numeric'});
+  }
+  function el(tag, cls, html){
+    var e = document.createElement(tag);
+    if(cls) e.className = cls;
+    if(html !== undefined) e.innerHTML = html;
+    return e;
+  }
+
+  // ---------------------------------------------------------------------
+  // icon set (hand-drawn, stroke-based, currentColor)
+  // ---------------------------------------------------------------------
+  var ICONS = {
+    scan: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3"/><path d="M20 8V5a1 1 0 0 0-1-1h-3"/><path d="M4 16v3a1 1 0 0 0 1 1h3"/><path d="M20 16v3a1 1 0 0 1-1 1h-3"/><circle cx="12" cy="12" r="3.4"/></svg>',
+    coin: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v9M9.3 9.3c0-1.1 1.2-2 2.7-2s2.7.9 2.7 2c0 2.6-5.4 1.5-5.4 4 0 1.1 1.2 2 2.7 2s2.7-.9 2.7-2"/></svg>',
+    ticket: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h15A1.5 1.5 0 0 1 21 8.5v2a1.5 1.5 0 0 0 0 3v2a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 15.5v-2a1.5 1.5 0 0 0 0-3v-2Z"/><path d="M9.5 7v10" stroke-dasharray="2.4 2.4"/></svg>',
+    shield: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 5 6v5.5c0 4.5 3 7.8 7 9 4-1.2 7-4.5 7-9V6l-7-2.5Z"/><path d="m9 12 2 2 4-4.2"/></svg>',
+    alertTriangle: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.6 4.3a1.6 1.6 0 0 1 2.8 0l8.2 14.6a1.6 1.6 0 0 1-1.4 2.4H3.8a1.6 1.6 0 0 1-1.4-2.4L10.6 4.3Z"/><path d="M12 9.5v4.2"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg>',
+    gear: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.8"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.9 2.9l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.9-2.9l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1h-.2a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.9-2.9l.1.1a1.7 1.7 0 0 0 1.9.3h.1a1.7 1.7 0 0 0 1-1.6v-.2a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.9 2.9l-.1.1a1.7 1.7 0 0 0-.3 1.9v.1a1.7 1.7 0 0 0 1.6 1h.2a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.6 1Z"/></svg>',
+    close: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+    chevron: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+    car: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 15.5 5 10.2a2 2 0 0 1 1.9-1.5h10.2a2 2 0 0 1 1.9 1.5l1.5 5.3"/><path d="M3.2 15.5h17.6v2.7a1 1 0 0 1-1 1h-1.2a1 1 0 0 1-1-1V17H6.4v1.2a1 1 0 0 1-1 1H4.2a1 1 0 0 1-1-1v-2.7Z"/><circle cx="7.3" cy="15.6" r="1.3"/><circle cx="16.7" cy="15.6" r="1.3"/><path d="M7 11.3h10"/></svg>',
+    check: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5 10-10"/></svg>',
+    flag: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4.5h11.3c1 0 1.4 1 .6 1.6l-3 2.4 3 2.4c.8.6.4 1.6-.6 1.6H5"/></svg>',
+    alert: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.4"/><circle cx="12" cy="16.3" r="0.9" fill="currentColor" stroke="none"/></svg>',
+    image: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.2"/><circle cx="9" cy="10" r="1.6"/><path d="m5 17 4.2-4.2a1.5 1.5 0 0 1 2.1 0L15 16.5"/><path d="m14.5 15 1.4-1.4a1.5 1.5 0 0 1 2.1 0L20.5 16"/></svg>',
+    warn: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.6 4.3a1.6 1.6 0 0 1 2.8 0l8.2 14.6a1.6 1.6 0 0 1-1.4 2.4H3.8a1.6 1.6 0 0 1-1.4-2.4L10.6 4.3Z"/><path d="M12 9.5v4.2"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg>'
+  };
+
+  var DECISION_ICON = { aprovado_automatico: ICONS.check, revisao_manual: ICONS.flag, fraude_suspeita: ICONS.alert };
+
+  // ---------------------------------------------------------------------
+  // header
+  // ---------------------------------------------------------------------
+  function renderHeader(app){
+    var k = DATA.kpis;
+    var makesCount = 12, insurersCount = 7; // small editorial constants for the stat strip
+    var bar = el('div','topbar');
+    bar.innerHTML =
+      '<div class="brand">'+
+        '<div class="brand-mark">'+ICONS.scan.replace('18','22').replace('18','22')+'</div>'+
+        '<div class="brand-text">'+
+          '<div class="eyebrow">Plataforma de vistoria por imagem</div>'+
+          '<h1>AutoVision AI</h1>'+
+        '</div>'+
+      '</div>'+
+      '<div class="topbar-right">'+
+        '<div class="stat-strip">'+
+          '<span><b>'+k.total_inspections+'</b> vistorias</span>'+
+          '<span class="dot"></span>'+
+          '<span><b>'+makesCount+'</b> montadoras</span>'+
+          '<span class="dot"></span>'+
+          '<span><b>'+insurersCount+'</b> seguradoras parceiras</span>'+
+        '</div>'+
+        '<div class="period-pill">'+ICONS.scan.replace(/18/g,'14')+'<span>Todo período (2021\u20132026)</span></div>'+
+        '<div class="icon-btn" title="Configurações">'+ICONS.gear+'</div>'+
+      '</div>';
+    app.appendChild(bar);
+  }
+
+  // ---------------------------------------------------------------------
+  // KPI cards
+  // ---------------------------------------------------------------------
+  function renderKpis(app){
+    var k = DATA.kpis;
+    var row = el('div','kpi-row');
+
+    var cards = [
+      {
+        accent:'accent-teal', icon: ICONS.coin, badge:['TOTAL','total'],
+        label:'Custo total estimado', value: brl(k.total_estimated_cost),
+        sub: '\u2191 histórico completo 2021\u20132026'
+      },
+      {
+        icon: ICONS.scan, iconColor: 'var(--blue)', iconBg:'var(--blue-dim)',
+        label:'Vistorias realizadas', value: k.total_inspections.toLocaleString('pt-BR'),
+        sub: (DATA.yearly_trend[DATA.yearly_trend.length-1].count)+' em 2026 (parcial)'
+      },
+      {
+        icon: ICONS.ticket, iconColor:'var(--violet)', iconBg:'var(--violet-dim)',
+        label:'Ticket médio de reparo', value: brl(k.avg_ticket),
+        sub: 'Calculado sobre '+k.total_inspections+' vistorias'
+      },
+      {
+        icon: ICONS.shield, iconColor:'var(--cyan)', iconBg:'var(--cyan-dim)',
+        label:'Aprovação automática', value: pct(k.auto_approval_rate),
+        sub: k.n_auto+' vistorias auto-aprovadas'
+      },
+      {
+        accent:'accent-red', icon: ICONS.alertTriangle, badge:['ATEN\u00c7\u00c3O','alert'],
+        label:'Taxa de fraude detectada', value: pct(k.fraud_rate),
+        sub: k.n_fraud+' casos sinalizados de '+k.total_inspections
+      },
+    ];
+
+    cards.forEach(function(c){
+      var card = el('div','kpi-card '+(c.accent||''));
+      var iconStyle = c.iconColor ? ('style="color:'+c.iconColor+';background:'+c.iconBg+'"') : '';
+      var top = '<div class="kpi-top"><div class="kpi-icon" '+iconStyle+'>'+c.icon+'</div>' +
+        (c.badge ? '<span class="kpi-badge '+c.badge[1]+'">'+c.badge[0]+'</span>' : '') + '</div>';
+      card.innerHTML = top +
+        '<div><div class="kpi-label">'+c.label+'</div>'+
+        '<div class="kpi-value">'+c.value+'</div>'+
+        '<div class="kpi-sub">'+c.sub+'</div></div>';
+      row.appendChild(card);
+    });
+    app.appendChild(row);
+  }
+
+  // ---------------------------------------------------------------------
+  // trend chart + damage mix
+  // ---------------------------------------------------------------------
+  function renderCharts(app){
+    var row = el('div','charts-row');
+
+    // -- trend chart --
+    var trendPanel = el('div','panel');
+    trendPanel.innerHTML =
+      '<div class="panel-head"><div><div class="panel-eyebrow">Tend\u00eancia</div><div class="panel-title">Vistorias Anuais</div></div>'+
+      '<div class="legend">'+
+        '<div class="legend-item"><span class="legend-dot" style="background:var(--blue)"></span>Conclu\u00eddas</div>'+
+        '<div class="legend-item"><span class="legend-dot" style="background:var(--teal)"></span>Ano recorde</div>'+
+        '<div class="legend-item"><span class="legend-dot" style="background:var(--amber)"></span>Em andamento</div>'+
+      '</div></div>';
+    var bars = el('div','bars');
+    var maxCount = Math.max.apply(null, DATA.yearly_trend.map(function(y){return y.count;}));
+    DATA.yearly_trend.forEach(function(y){
+      var col = el('div','bar-col');
+      var h = Math.max(10, (y.count/maxCount)*168);
+      var cls = y.status === 'record' ? 'record' : (y.status === 'current' ? 'current' : '');
+      col.innerHTML = '<span class="bar-value">'+y.count+'</span>'+
+        '<div class="bar '+cls+'" style="height:'+h+'px" title="'+y.year+': '+y.count+' vistorias \u2014 '+brl(y.cost)+' em custos estimados"></div>'+
+        '<span class="bar-label">'+y.year+'</span>';
+      bars.appendChild(col);
+    });
+    trendPanel.appendChild(bars);
+    row.appendChild(trendPanel);
+
+    // -- damage mix --
+    var mixPanel = el('div','panel');
+    mixPanel.innerHTML = '<div class="panel-head"><div><div class="panel-eyebrow">Mix de danos</div><div class="panel-title">Custo Por Categoria</div></div></div>';
+    var list = el('div','mix-list');
+    DATA.damage_mix.forEach(function(m){
+      var row2 = el('div','mix-row');
+      row2.innerHTML =
+        '<div class="mix-top"><div class="mix-name"><span class="mix-dot" style="background:'+m.color+'"></span>'+m.label+'</div>'+
+        '<div class="mix-value">'+brl(m.cost)+'</div></div>'+
+        '<div class="mix-track"><div class="mix-fill" style="width:'+m.pct+'%;background:'+m.color+'"></div></div>'+
+        '<div class="mix-sub">'+pct(m.pct)+' do custo total \u00b7 '+m.count+' ocorr\u00eancias</div>';
+      list.appendChild(row2);
+    });
+    mixPanel.appendChild(list);
+    row.appendChild(mixPanel);
+
+    app.appendChild(row);
+  }
+
+  // ---------------------------------------------------------------------
+  // recent inspections table
+  // ---------------------------------------------------------------------
+  var currentFilter = 'all';
+
+  function renderTable(app){
+    var panel = el('div','panel table-panel');
+    var counts = {all:0, aprovado_automatico:0, revisao_manual:0, fraude_suspeita:0};
+    DATA.recent_inspections.forEach(function(r){ counts.all++; counts[r.decision]++; });
+
+    panel.innerHTML =
+      '<div class="panel-head"><div><div class="panel-eyebrow">Vistorias</div><div class="panel-title">Casos Recentes</div>'+
+      '<div style="font-size:12px;color:var(--text-3);margin-top:4px">mostrando as '+DATA.recent_inspections.length+' vistorias mais recentes de '+DATA.kpis.total_inspections+' no total</div></div>'+
+      '<div class="filter-chips" id="filterChips">'+
+        chip('all','Todas',counts.all)+
+        chip('aprovado_automatico','Aprovadas',counts.aprovado_automatico)+
+        chip('revisao_manual','Revis\u00e3o',counts.revisao_manual)+
+        chip('fraude_suspeita','Fraude',counts.fraude_suspeita)+
+      '</div></div>'+
+      '<table><thead><tr>'+
+      '<th>Ve\u00edculo</th><th>Data</th><th>Severidade</th><th>Danos</th><th>Score de fraude</th><th>Custo estimado</th><th>Decis\u00e3o</th><th></th>'+
+      '</tr></thead><tbody id="tableBody"></tbody></table>';
+
+    app.appendChild(panel);
+
+    panel.querySelector('#filterChips').addEventListener('click', function(e){
+      var c = e.target.closest('.chip');
+      if(!c) return;
+      currentFilter = c.getAttribute('data-key');
+      panel.querySelectorAll('.chip').forEach(function(x){x.classList.remove('active');});
+      c.classList.add('active');
+      fillTableBody(panel.querySelector('#tableBody'));
+    });
+
+    fillTableBody(panel.querySelector('#tableBody'));
+
+    function chip(key,label,n){
+      return '<div class="chip'+(key==='all'?' active':'')+'" data-key="'+key+'">'+label+' <span class="n">'+n+'</span></div>';
+    }
+  }
+
+  function fillTableBody(tbody){
+    tbody.innerHTML = '';
+    var rows = DATA.recent_inspections.filter(function(r){
+      return currentFilter === 'all' || r.decision === currentFilter;
+    });
+    if(rows.length === 0){
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-note">Nenhuma vistoria neste filtro.</td></tr>';
+      return;
+    }
+    rows.forEach(function(r){
+      var tr = el('tr');
+      tr.tabIndex = 0;
+      var dm = DATA.decision_meta[r.decision];
+      var sm = DATA.severity_meta[r.severity_band];
+      tr.innerHTML =
+        '<td><div class="veh-cell"><div class="veh-avatar">'+ICONS.car+'</div>'+
+          '<div><div class="veh-name">'+r.make+' '+r.model+'</div><div class="veh-plate">'+r.plate_masked+'</div></div></div></td>'+
+        '<td class="muted">'+dateBR(r.date)+'</td>'+
+        '<td><span class="badge-sev"><span class="dot" style="background:'+sm.color+'"></span>'+sm.label+'</span></td>'+
+        '<td>'+(r.damage_regions.length ? r.damage_regions.length+(r.damage_regions.length===1 ? ' dano detectado' : ' danos detectados') : 'nenhum dano detectado')+'</td>'+
+        '<td class="mono">'+(r.fraud_score>0 ? r.fraud_score.toFixed(0)+'/100' : '\u2014')+'</td>'+
+        '<td class="mono">'+(r.estimated_cost>0 ? brl(r.estimated_cost) : '\u2014')+'</td>'+
+        '<td><span class="pill" style="background:'+dm.color+'22;color:'+dm.color+'">'+dm.label+'</span></td>'+
+        '<td class="row-arrow">'+ICONS.chevron+'</td>';
+      tr.addEventListener('click', function(){ openModal(r); });
+      tr.addEventListener('keypress', function(ev){ if(ev.key==='Enter') openModal(r); });
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ---------------------------------------------------------------------
+  // car diagram (top view) + damage-zone mapping
+  // ---------------------------------------------------------------------
+  var ZONES = {
+    para_choque_dianteiro:[200,16], capo:[200,46],
+    farol_esquerdo:[112,26], farol_direito:[288,26],
+    parabrisa:[200,72], teto:[200,112],
+    porta_de:[78,92], porta_dd:[322,92],
+    porta_te:[78,142], porta_td:[322,142],
+    vidro_traseiro:[200,152],
+    painel_te:[110,184], painel_td:[290,184],
+    lanterna_esquerda:[112,206], lanterna_direita:[288,206],
+    para_choque_traseiro:[200,206],
+    roda_de:[36,58], roda_dd:[364,58], roda_te:[36,166], roda_td:[364,166],
+    chassi:[200,129]
+  };
+  var CAT_ZONES = {
+    amassado: ['porta_de','porta_dd','painel_te','painel_td','capo','para_choque_traseiro'],
+    arranhao: ['porta_te','porta_td','painel_te','painel_td','capo','para_choque_dianteiro'],
+    vidro: ['parabrisa','vidro_traseiro'],
+    farol_lanterna: ['farol_esquerdo','farol_direito','lanterna_esquerda','lanterna_direita'],
+    estrutural: ['chassi','teto'],
+    pneu_roda: ['roda_de','roda_dd','roda_te','roda_td']
+  };
+
+  function carSvg(regions){
+    var counters = {};
+    var markers = '';
+    regions.forEach(function(r, idx){
+      var list = CAT_ZONES[r.category] || ['chassi'];
+      var n = counters[r.category] || 0;
+      var zoneKey = list[n % list.length];
+      counters[r.category] = n+1;
+      var pos = ZONES[zoneKey];
+      var color = DATA.category_meta[r.category].color;
+      var radius = 6 + (r.severity/100)*8;
+      markers += '<circle cx="'+pos[0]+'" cy="'+pos[1]+'" r="'+(radius+5)+'" fill="'+color+'" opacity="0.16"/>' +
+        '<circle cx="'+pos[0]+'" cy="'+pos[1]+'" r="'+radius+'" fill="'+color+'" opacity="0.9" stroke="'+color+'" stroke-width="1.5"><title>'+DATA.category_meta[r.category].label+' \u2014 severidade '+r.severity.toFixed(0)+'</title></circle>';
+    });
+
+    return '<svg width="320" height="240" viewBox="0 0 400 230" xmlns="http://www.w3.org/2000/svg">'+
+      '<defs><linearGradient id="carBody" x1="0" y1="0" x2="0" y2="1">'+
+        '<stop offset="0%" stop-color="#2A3140"/><stop offset="100%" stop-color="#1B212C"/>'+
+      '</linearGradient></defs>'+
+      '<rect x="0" y="0" width="400" height="230" fill="transparent"/>'+
+      '<path d="M180 8 Q200 2 220 8 Q248 14 260 34 L268 60 Q272 90 268 110 L268 150 Q272 175 264 196 Q252 216 228 220 L172 220 Q148 216 136 196 Q128 175 132 150 L132 110 Q128 90 132 60 L140 34 Q152 14 180 8 Z" '+
+        'fill="url(#carBody)" stroke="#3A4152" stroke-width="1.5"/>'+
+      '<rect x="150" y="72" width="100" height="70" rx="10" fill="#141821" stroke="#3A4152" stroke-width="1.2"/>'+
+      '<line x1="200" y1="72" x2="200" y2="142" stroke="#3A4152" stroke-width="1"/>'+
+      '<rect x="150" y="18" width="100" height="18" rx="4" fill="#10131A" stroke="#3A4152" stroke-width="1"/>'+
+      '<rect x="150" y="192" width="100" height="16" rx="4" fill="#10131A" stroke="#3A4152" stroke-width="1"/>'+
+      '<rect x="18" y="42" width="16" height="36" rx="5" fill="#0D1017" stroke="#3A4152"/>'+
+      '<rect x="366" y="42" width="16" height="36" rx="5" fill="#0D1017" stroke="#3A4152"/>'+
+      '<rect x="18" y="150" width="16" height="36" rx="5" fill="#0D1017" stroke="#3A4152"/>'+
+      '<rect x="366" y="150" width="16" height="36" rx="5" fill="#0D1017" stroke="#3A4152"/>'+
+      markers +
+      '</svg>';
+  }
+
+  // ---------------------------------------------------------------------
+  // laudo modal
+  // ---------------------------------------------------------------------
+  var TAMPER_LABELS = {
+    exif_ausente: 'Metadados EXIF ausentes',
+    software_edicao: 'Software de edi\u00e7\u00e3o detectado',
+    data_captura_ausente: 'Data de captura ausente',
+    ela_anomalia: 'Anomalia na an\u00e1lise de n\u00edvel de erro (ELA)'
+  };
+
+  function pipelineSteps(r, groupedSignals){
+    var hasQualityIssue = r.quality.some(function(q){ return !q.usable; });
+    var hasDamage = r.damage_regions.length > 0;
+    var hasFraud = groupedSignals.length > 0;
+    return [
+      {title:'Recebimento das fotos', detail: r.n_images+' imagens recebidas', state:'done'},
+      {title:'Verifica\u00e7\u00e3o de qualidade e autenticidade', detail: hasQualityIssue ? 'uma ou mais fotos com qualidade insuficiente' : 'todas as fotos aprovadas na triagem', state: hasQualityIssue ? 'flag':'done'},
+      {title:'Identifica\u00e7\u00e3o de placa e ve\u00edculo', detail: r.make+' '+r.model+' \u00b7 placa '+r.plate_masked, state:'done'},
+      {title:'Detec\u00e7\u00e3o de danos', detail: hasDamage ? r.damage_regions.length+' regi\u00e3o(\u00f5es) de dano identificadas' : 'nenhum dano relevante identificado', state: hasDamage ? 'flag':'done'},
+      {title:'Avalia\u00e7\u00e3o da gravidade', detail: 'severidade classificada como '+DATA.severity_meta[r.severity_band].label.toLowerCase()+' ('+r.severity_score.toFixed(0)+'/100)', state:'done'},
+      {title:'Estimativa de custo', detail: r.estimated_cost>0 ? brl(r.estimated_cost)+' em reparos estimados' : 'sem custo de reparo estimado', state:'done'},
+      {title:'Verifica\u00e7\u00e3o de sinais de fraude', detail: hasFraud ? groupedSignals.length+' tipo(s) de sinal de manipula\u00e7\u00e3o encontrados' : 'nenhum sinal de manipula\u00e7\u00e3o encontrado', state: hasFraud ? 'flag':'done'},
+      {title:'Gera\u00e7\u00e3o do laudo', detail:'relat\u00f3rio estruturado compilado automaticamente', state:'done'},
+      {title:'Decis\u00e3o', detail: DATA.decision_meta[r.decision].label, state: r.decision==='fraude_suspeita' ? 'flag':'done'}
+    ];
+  }
+
+  function groupSignals(signals){
+    var map = {};
+    var order = [];
+    signals.forEach(function(s){
+      if(!map[s.name]){ map[s.name] = {name:s.name, detail:s.detail, weight:0, count:0}; order.push(s.name); }
+      map[s.name].weight += s.weight;
+      map[s.name].count += 1;
+    });
+    return order.map(function(n){ return map[n]; });
+  }
+
+  function openModal(r){
+    var modal = document.getElementById('modal');
+    var dm = DATA.decision_meta[r.decision];
+    var sm = DATA.severity_meta[r.severity_band];
+    var groupedSignals = groupSignals(r.tamper_signals);
+
+    var bannerColor = dm.color;
+    var head =
+      '<div class="modal-head"><div class="modal-head-left">'+
+        '<div class="modal-veh-icon">'+ICONS.car+'</div>'+
+        '<div><div class="modal-title">'+r.make+' '+r.model+' \u00b7 '+r.plate_masked+'</div>'+
+        '<div class="modal-meta">'+r.vehicle_id+' <span class="dot"></span> '+dateBR(r.date)+' <span class="dot"></span> '+r.insurer+' \u00b7 '+r.state+'</div></div>'+
+      '</div><button class="modal-close" id="closeModalBtn">'+ICONS.close+'</button></div>';
+
+    var body = '<div class="modal-body">';
+    body += '<div class="decision-banner" style="background:'+bannerColor+'14;border-color:'+bannerColor+'44">'+
+      '<div class="decision-icon" style="background:'+bannerColor+'22;color:'+bannerColor+'">'+DECISION_ICON[r.decision]+'</div>'+
+      '<div><div class="decision-title" style="color:'+bannerColor+'">'+dm.label+'</div>'+
+      '<div class="decision-reason">'+r.decision_reason+'</div></div></div>';
+
+    body += '<div class="modal-grid">';
+    body += '<div class="car-diagram-wrap">'+carSvg(r.damage_regions)+
+      '<div class="diagram-caption">Zonas aproximadas dos danos identificados pela IA, a partir das '+r.n_images+' fotos enviadas</div></div>';
+
+    body += '<div class="metric-stack">'+
+      metricBox('Severidade do dano', r.severity_score.toFixed(0)+'/100', sm.color, r.severity_score) +
+      metricBox('Score de fraude', r.fraud_score.toFixed(0)+'/100', r.fraud_score>0 ? 'var(--red)':'var(--text-3)', r.fraud_score) +
+      metricBox('Qualidade das fotos', r.quality.filter(function(q){return q.usable;}).length+'/'+r.quality.length+' utiliz\u00e1veis', 'var(--blue)', (r.quality.filter(function(q){return q.usable;}).length/r.quality.length)*100) +
+      '</div>';
+    body += '</div>';
+
+    // damage regions
+    body += '<div class="section-label">Danos identificados</div>';
+    if(r.damage_regions.length){
+      body += '<div class="damage-list">' + r.damage_regions.map(function(d){
+        var cm = DATA.category_meta[d.category];
+        return '<div class="damage-item"><div class="damage-item-left"><span class="damage-cat-dot" style="background:'+cm.color+'"></span>'+cm.label+
+          '<span class="muted">\u00b7 severidade '+d.severity.toFixed(0)+'</span></div><span class="damage-conf">confian\u00e7a '+(d.confidence*100).toFixed(0)+'%</span></div>';
+      }).join('') + '</div>';
+    } else {
+      body += '<div class="empty-note">Nenhuma regi\u00e3o de dano relevante identificada nas fotos analisadas.</div>';
+    }
+
+    // tamper signals
+    body += '<div class="section-label">Sinais de fraude / manipula\u00e7\u00e3o</div>';
+    if(groupedSignals.length){
+      body += '<div class="signal-list">' + groupedSignals.map(function(s){
+        var countTag = s.count > 1 ? ' <span class="muted">(\u00d7'+s.count+' fotos)</span>' : '';
+        return '<div class="signal-item"><span class="signal-icon">'+ICONS.warn+'</span>'+
+          '<div><div class="signal-name">'+(TAMPER_LABELS[s.name]||s.name)+countTag+'</div>'+
+          '<div class="signal-detail">'+s.detail+'</div></div>'+
+          '<span class="signal-weight">peso '+s.weight.toFixed(0)+'</span></div>';
+      }).join('') + '</div>';
+    } else {
+      body += '<div class="empty-note">Nenhum sinal de manipula\u00e7\u00e3o de imagem encontrado.</div>';
+    }
+
+    // pipeline
+    body += '<div class="section-label">Pipeline de an\u00e1lise da IA</div><div class="pipeline">' +
+      pipelineSteps(r, groupedSignals).map(function(s, i){
+        return '<div class="pipe-step '+s.state+'"><div class="pipe-marker">'+(s.state==='done'?ICONS.check:(i+1))+'</div><div class="pipe-line"></div>'+
+          '<div class="pipe-text"><div class="pipe-title">'+s.title+'</div><div class="pipe-detail">'+s.detail+'</div></div></div>';
+      }).join('') + '</div>';
+
+    body += '</div>';
+
+    modal.innerHTML = head + body;
+    document.getElementById('modalBackdrop').classList.add('open');
+    document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+    document.body.style.overflow = 'hidden';
+  }
+
+  function metricBox(label, value, color, fillPct){
+    return '<div class="metric-box"><div class="metric-box-top"><span class="metric-label">'+label+'</span><span class="metric-num" style="color:'+color+'">'+value+'</span></div>'+
+      '<div class="gauge-track"><div class="gauge-fill" style="width:'+Math.min(100,fillPct)+'%;background:'+color+'"></div></div></div>';
+  }
+
+  function closeModal(){
+    document.getElementById('modalBackdrop').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('modalBackdrop').addEventListener('click', function(e){
+    if(e.target.id === 'modalBackdrop') closeModal();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeModal();
+  });
+
+  // ---------------------------------------------------------------------
+  // footer + boot
+  // ---------------------------------------------------------------------
+  function renderFootnote(app){
+    app.appendChild(el('div','footnote',
+      'Dashboard de demonstra\u00e7\u00e3o \u2014 os dados acima foram gerados processando fotos sint\u00e9ticas atrav\u00e9s do <b>mesmo pipeline de vis\u00e3o computacional em Python</b> que analisaria fotos reais de veículos (qualidade, detec\u00e7\u00e3o de dano, ELA e checagem de EXIF). Clique em qualquer vistoria para ver o laudo completo.'));
+  }
+
+  function boot(){
+    var app = document.getElementById('app');
+    renderHeader(app);
+    renderKpis(app);
+    renderCharts(app);
+    renderTable(app);
+    renderFootnote(app);
+
+    // open one highlighted case automatically isn't done to avoid surprise;
+    // instead we just make sure the first render works standalone.
+  }
+
+  boot();
+})();
+
+</script>
+</body>
+</html>
